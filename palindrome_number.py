@@ -1,15 +1,12 @@
-#palindrome number
-#a palindrome number is a number which when reversed is eqaul to the original number
-#example 525
-#floor division----//
-rev=0
-n=int(input(":to check for palindrome:\n enter the number:"))
-num=n
+#palindrome number--->reverse of number==original number
+n=int(input("enter the number:"))
+d=r=0
+temp=n
 while n!=0:
     d=n%10
-    rev=rev*10+d
+    r=r*10+d
     n=n//10
-if(rev==num):
-    print("entered number is palindrome")
+if r==temp:
+    print("palindrome number")
 else:
-    print("entered number is not palindrome")
+    print("mot a palindrome number")
