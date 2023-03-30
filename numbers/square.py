@@ -1,4 +1,5 @@
 #printing numbers--->square
+#print number who is a square of smaller number
 def sq(x,y):
     for i in range(x,y):
                     sqrt=int(pow(i,0.5))
