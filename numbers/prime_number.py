@@ -6,5 +6,4 @@ for i in range(1,x+1):
     if x%i==0:
         c=c+1
 if(c==2):
-    print("the en
-          tered number is prime")
+    print("the entered number is prime")
