@@ -179,3 +179,23 @@ async def user_update(user_id:int,update:dict):
             return user
     raise HTTPException(status_code=404,detail="not found")
 
+
+# @api.delete('/user/delete/{user_id}')
+# async def user_delete(user_id:int):
+#     for user in users:
+#         if user["id"]==user_id:
+#             users.remove(user)
+#             return {"msg":"done", "new list":users}
+#         else:
+#             raise HTTPException(status_code=404,detail='not found') 
+# only sequentially
+
+
+@api.delete('/user/delete/{user_id}')
+async def user_delete(user_id:int):
+    for index,user in enumerate(users):
+        if user["id"]==user_id:
+            new=users.pop(index)
+            return {"msg":"done", "new list":users, "new":new}
+    
+    raise HTTPException(status_code=404,detail='not found') 
