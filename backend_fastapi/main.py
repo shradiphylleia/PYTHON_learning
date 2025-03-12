@@ -150,7 +150,21 @@ async def user_details_name_role(name:str=None,role:str=None):
     raise HTTPException(status_code=404,detail="no user with the name and role")
 
 
+# post methods
+# adding a new user with name:Shrek email:shrek@examole.com role:HR "created_at": "2025-03-12T10:35:00Z"
 
+@api.post('/new_user')
+async def create_user(user:dict):
+    new_user_id=max(user["id"] for user in users)+1
 
-
+    new_user={
+        'id':new_user_id,
+        'name': user["name"],
+        'email':user['email'],
+        'role': user['role'],
+        'created_at':user['created_at']
+    }
     
+    users.append(new_user)
+
+    return {"msg": "added new_user"}
