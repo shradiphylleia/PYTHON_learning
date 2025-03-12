@@ -167,4 +167,15 @@ async def create_user(user:dict):
     
     users.append(new_user)
 
-    return {"msg": "added new_user"}
+    return {'msg': 'added new_user'}
+
+@api.put('/user/update/{user_id}')
+async def user_update(user_id:int,update:dict):
+    for user in users:
+        if user['id']==user_id:
+            user['name']=update['name']
+            user['email']=update['email']
+            user['role']=update['role']
+            return user
+    raise HTTPException(status_code=404,detail="not found")
+
