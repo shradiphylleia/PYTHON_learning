@@ -12,14 +12,13 @@ class EmployeeBase(BaseModel):
     role:str=Field(...,min_length=1,description='name of the role')
     email:str=Field(...,min_length=4,description='email id for the employee')
 
+# response model
+class Employee(EmployeeBase):
+    id:int
 
 # creating a new emp emp_id auto-generat [Inpout model]
 class EmployeeCreate(EmployeeBase):
     pass
-
-# response model
-class Employee(EmployeeBase):
-    id:int
 
 class EmployeeUpdate(BaseModel):
     name:Optional[str]=Field(None,min_length=1,description='name of the employee')
@@ -42,7 +41,7 @@ def welcome():
 @api.post('/emp/new',response_model=Employee)
 def add_employee(employee:EmployeeCreate):
     global emp_counter
-    new_employee=EmployeeCreate(id=emp_counter,**employee.model_dump())
+    new_employee=Employee(id=emp_counter,**employee.model_dump())
     db.append(new_employee)
     emp_counter+=1
     return new_employee
@@ -54,18 +53,18 @@ def list_employee():
     return db
 
 # get by name
-@api.get('/emp/{name}',response_model=List[Employee])
+@api.get('/emp/name/{name}',response_model=List[Employee])
 def list_name_emp(name:str):
     for emp in db:
-        if emp["name"]==name:
+        if emp.name==name:
             return emp["email"]
     raise HTTPException(status_code=404, detail='not found')
 
 # get by role 
-@api.get('/emp/{role}',response_model=List[Employee])
+@api.get('/emp/role/{role}',response_model=List[Employee])
 def list_role_emp(role:str):
     for emp in db:
-        if emp["role"]==role:
+        if emp.role==role:
             return emp
     raise HTTPException(status_code=404, detail="not found")
 
