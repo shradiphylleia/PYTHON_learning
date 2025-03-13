@@ -8,19 +8,21 @@ api=FastAPI()
 # parent class- basic schema and data types:
 
 class EmployeeBase(BaseModel):
-    name:str=Field(...,min_lenght=1,description='name of the employee')
+    name:str=Field(...,min_length=1,description='name of the employee')
     role:str=Field(...,min_length=1,description='name of the role')
     email:str=Field(...,min_length=4,description='email id for the employee')
 
 
-# create the schema employee emp_id auto-generat
+# creating a new emp emp_id auto-generat [Inpout model]
 class EmployeeCreate(EmployeeBase):
     pass
 
-
+# response model
+class Employee(EmployeeBase):
+    id:int
 
 class EmployeeUpdate(BaseModel):
-    name:Optional[str]=Field(None,min_lenght=1,description='name of the employee')
+    name:Optional[str]=Field(None,min_length=1,description='name of the employee')
     role:Optional[str]=Field(None,min_length=1,description='name of the role')
     email:Optional[str]=Field(None,min_length=4) 
 
@@ -28,6 +30,7 @@ class EmployeeUpdate(BaseModel):
 # endpoints:
 # get method:
 db=[]
+emp_counter=0
 
 @api.get('/')
 def welcome():
@@ -36,29 +39,30 @@ def welcome():
 
 # crud on employee
 # creating a new emp
-
-@api.post('/emp/new',response_model=EmployeeCreate)
-def add_emplyee(employee:EmployeeCreate):
-    new_employee=EmployeeCreate(**employee.model_dump())
+@api.post('/emp/new',response_model=Employee)
+def add_employee(employee:EmployeeCreate):
+    global emp_counter
+    new_employee=EmployeeCreate(id=emp_counter,**employee.model_dump())
     db.append(new_employee)
+    emp_counter+=1
     return new_employee
 
 
 # get: list of users:
-@api.get('/emp/list',response_model=List[EmployeeCreate])
+@api.get('/emp/list',response_model=List[Employee])
 def list_employee():
     return db
 
 # get by name
-@api.get('/emp/{name}',response_model=List[EmployeeCreate])
-def list_name_emp(name:int):
+@api.get('/emp/{name}',response_model=List[Employee])
+def list_name_emp(name:str):
     for emp in db:
         if emp["name"]==name:
             return emp["email"]
     raise HTTPException(status_code=404, detail='not found')
 
 # get by role 
-@api.get('/emp/{role}',response_model=EmployeeCreate)
+@api.get('/emp/{role}',response_model=List[Employee])
 def list_role_emp(role:str):
     for emp in db:
         if emp["role"]==role:
@@ -66,8 +70,7 @@ def list_role_emp(role:str):
     raise HTTPException(status_code=404, detail="not found")
 
 # update
-
-@api.put('/emp/update_details/{id}',response_model=EmployeeCreate)
+@api.put('/emp/update_details/{id}',response_model=Employee)
 def update_emp(id:int, data:EmployeeUpdate):
     for index,emp in enumerate(db):
         if emp.id==id:
@@ -76,3 +79,12 @@ def update_emp(id:int, data:EmployeeUpdate):
             db[index]=update_data
             return data
     raise HTTPException(status_code=404, detail="not found")
+
+# delete
+@api.delete('/emp/delete/{emp_id}')
+def delete_emp(emp_id:int):
+    for index,emp in enumerate(db):
+        if emp.id==emp_id:
+            db.pop(index)
+            return{"message":"Employee deleted"}
+    raise HTTPException(status_code=404, detail="emp id does not exist")
