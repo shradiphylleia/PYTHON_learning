@@ -53,31 +53,33 @@ def list_employee():
     return db
 
 # get by name
-@api.get('/emp/name/{name}',response_model=List[Employee])
-def list_name_emp(name:str):
-    for emp in db:
-        if emp.name==name:
-            return emp["email"]
-    raise HTTPException(status_code=404, detail='not found')
+@api.get('/emp/name/{name}', response_model=List[Employee])
+def list_name_emp(name: str):
+    result=[emp for emp in db if emp.name == name]
+    if not result:
+        raise HTTPException(status_code=404, detail="not found")
+    return result
+
 
 # get by role 
 @api.get('/emp/role/{role}',response_model=List[Employee])
 def list_role_emp(role:str):
-    for emp in db:
-        if emp.role==role:
-            return emp
-    raise HTTPException(status_code=404, detail="not found")
+    result=[emp for emp in db if emp.role==role]
+    if not result:
+        raise HTTPException(status_code=404, detail="not found")
+    return result
 
 # update
-@api.put('/emp/update_details/{id}',response_model=Employee)
-def update_emp(id:int, data:EmployeeUpdate):
-    for index,emp in enumerate(db):
+@api.put('/emp/update_details/{id}', response_model=Employee)
+def update_emp(id:int,data:EmployeeUpdate):
+    for index, emp in enumerate(db):
         if emp.id==id:
-            update_field=data.dict(exclude_unset=True)
-            update_data=emp.copy(update=update_field)
-            db[index]=update_data
-            return data
-    raise HTTPException(status_code=404, detail="not found")
+            update_fields=data.model_dump(exclude_unset=True)
+            updated_emp=emp.model_copy(update=update_fields)
+            db[index]=updated_emp
+            return updated_emp
+    raise HTTPException(status_code=404,detail="Employee not found")
+
 
 # delete
 @api.delete('/emp/delete/{emp_id}')
